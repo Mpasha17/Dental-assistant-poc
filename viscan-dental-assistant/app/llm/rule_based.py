@@ -67,6 +67,32 @@ def find_fdi(text: str) -> str | None:
     return bare.group(1) if bare else None
 
 
+_GREETING_RE = re.compile(
+    r"(hi|hello|hey|hiya|howdy|yo|greetings|good\s+(morning|afternoon|evening|day)|"
+    r"thanks|thank\s+you|thanks\s+a\s+lot|thank\s+you\s+so\s+much|cheers|"
+    r"how\s+are\s+you|how\s+are\s+you\s+doing|what'?s\s+up)"
+    r"(\s+(there|team|doc|doctor|viscan|everyone|again))?",
+    re.IGNORECASE,
+)
+
+GREETING_REPLY = (
+    "Hello! I'm your dental assistant. I can open patient reports, turn dictation into a "
+    "draft report, summarize or answer questions about a report, and book scans. "
+    'Try "Open Priya\'s latest OPG report".'
+)
+
+
+def is_greeting(text: str) -> bool:
+    """True when the whole message is a greeting or small talk, never a name or request."""
+
+    cleaned = re.sub(r"[\s.,!?:;)(-]+", " ", text or "").strip()
+    if not cleaned:
+        return False
+    parts = re.split(r"\s*(?:,|\band\b)\s*|\s+(?=(?:hi|hello|hey|thanks|thank|good|how)\b)", cleaned, flags=re.I)
+    parts = [part for part in parts if part.strip()]
+    return all(_GREETING_RE.fullmatch(part.strip()) for part in parts)
+
+
 def is_confirmation(text: str) -> bool:
     """True only for an explicit confirmation such as 'yes, confirm'."""
 
@@ -330,6 +356,8 @@ class RuleBasedProvider:
 
     def interpret(self, text: str, context: dict[str, Any], tools: list[dict[str, Any]]) -> ToolCall:
         raw = text.strip()
+        if is_greeting(raw):
+            return ToolCall("unknown", {"utterance": raw, "reason": "greeting"})
         pending_booking = context.get("pending_booking") or None
         if pending_booking and is_confirmation(raw):
             return ToolCall(

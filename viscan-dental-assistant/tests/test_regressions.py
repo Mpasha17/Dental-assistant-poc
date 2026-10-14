@@ -209,3 +209,39 @@ def test_ui_fixes_present():
     assert "#draft-text { text-transform: none" in html
     assert "Available reports" in html
     assert "lastProvider" in html
+
+
+@pytest.mark.parametrize(
+    "text", ["hi", "Hello!", "hey there", "Good morning", "thanks", "Thank you.", "hi, good morning"]
+)
+def test_greeting_gets_a_warm_reply_without_tools(monkeypatch, client, text):
+    class ExplodingRouter:
+        used_fallback = False
+
+        def interpret(self, *_args, **_kwargs):
+            raise AssertionError("greetings must not reach the interpreter")
+
+    monkeypatch.setattr("app.llm.router.get_llm_router", lambda: ExplodingRouter())
+    body = client.post("/chat", json={"text": text}).json()
+    assert body["intent"] == "greeting"
+    assert body["answer"].startswith("Hello! I'm your dental assistant.")
+    assert "Open Priya's latest OPG report" in body["answer"]
+    assert body["sources"] == []
+    assert body["needs_clarification"] is False
+    assert body["clarification_options"] == []
+
+
+def test_greeting_validator_overrides_model_name_guess():
+    from app.session import Session
+    from app.validation.rules import validate_call
+
+    outcome = validate_call(ToolCall("find_patient", {"name": "hi"}), "hi", Session(id="g"), "dentist")
+    assert outcome.handled and outcome.intent == "greeting"
+
+
+def test_non_greetings_are_not_greetings():
+    from app.llm.rule_based import is_greeting
+
+    assert not is_greeting("hi, open Priya's latest OPG report")
+    assert not is_greeting("Hilda")
+    assert not is_greeting("")

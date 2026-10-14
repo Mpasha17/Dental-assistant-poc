@@ -14,7 +14,8 @@ from app.tools.dictation import create_draft
 from app.tools.patients import get_patient, public_patient
 from app.tools.registry import execute_tool, tool_schemas
 from app.tools.reports import report_summary
-from app.validation.rules import Outcome, validate_call
+from app.llm.rule_based import is_greeting
+from app.validation.rules import Outcome, greeting_outcome, validate_call
 
 logger = get_logger()
 
@@ -375,6 +376,9 @@ def handle_text(
     session = session_store.get(session_id)
     from app.llm.router import get_llm_router
 
+    if is_greeting(text):
+        # Greetings never reach a model, so "hi" cannot be read as a patient name.
+        return _from_outcome(session, greeting_outcome(), "rule", started, stt_provider, transcript)
     router = get_llm_router()
     call, provider_used = router.interpret(text, build_context(session), tool_schemas())
     if not isinstance(call, ToolCall):

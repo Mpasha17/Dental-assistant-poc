@@ -136,7 +136,7 @@ HTTP 200
 
 ```json
 {
-  "session_id": "be2ca8fb43d5432a9667656afd0a71e7",
+  "session_id": "b4c0eb96af2c43dc99318228bffd3426",
   "intent": "retrieve_report",
   "answer": "Rahul Verma's latest OPG report is R007 dated 2026-08-19.\nClinician: Dr. Sameer Qureshi\nFindings:\n- Lower right third molar is horizontally impacted (FDI 48)\n- Mild bone loss around the lower incisors\nImpression: Horizontal impaction of the mandibular right third molar. Mild mandibular anterior bone loss.",
   "data": {
@@ -433,7 +433,7 @@ HTTP 200
 
 ```json
 {
-  "session_id": "bf19865e79ab434c99704b982dc46215",
+  "session_id": "380f17e79e954180884eca2e44018545",
   "intent": "missing_report",
   "answer": "No OPG report found for Kavya Reddy. Available reports: CBCT (2026-09-01, R017), Bitewing (2026-06-18, R016), IOPA (2026-06-18, R015).",
   "data": {
@@ -654,7 +654,7 @@ HTTP 200
   "provider_used": "rule",
   "stt_provider": null,
   "transcript": null,
-  "latency_ms": 1,
+  "latency_ms": 0,
   "warnings": []
 }
 ```
@@ -768,7 +768,7 @@ HTTP 200
 
 ```json
 {
-  "session_id": "53895fcaa1f547ab8a63cf11dd1dfd8d",
+  "session_id": "06cd41df280243e1997af4207107eb96",
   "intent": "clarify_patient",
   "answer": "Which patient's report should I use?",
   "data": null,
@@ -832,11 +832,11 @@ HTTP 200
 
 ```json
 {
-  "session_id": "8537e1e76224400a81dcc24f25e9dfe5",
+  "session_id": "d10ba8d2a3bc4428948a07911b09fbb5",
   "intent": "draft_report",
   "answer": "Clinical draft report\nPatient: unassigned\n\nFindings:\n1. Lower right third molar (FDI 48, Universal 32): Lower right third molar is horizontally impacted [classification: horizontal; certainty: stated]\n   Evidence: \"Lower right third molar is horizontally impacted\"\n\nDRAFT - requires clinician review. Not a final diagnosis.",
   "data": {
-    "report_id": "draft-ad11e2f7-36e9-4169-bff0-a83afc74ab59",
+    "report_id": "draft-37928642-e09f-430b-b64f-9e1a138a5944",
     "patient_id": null,
     "status": "draft",
     "requires_clinician_review": true,
@@ -862,7 +862,7 @@ HTTP 200
   },
   "sources": [
     {
-      "report_id": "draft-ad11e2f7-36e9-4169-bff0-a83afc74ab59",
+      "report_id": "draft-37928642-e09f-430b-b64f-9e1a138a5944",
       "patient_id": null,
       "fields": [
         "transcript",
@@ -895,11 +895,11 @@ HTTP 200
 
 ```json
 {
-  "session_id": "bd9e0a27be494a2f81fcb18093afd630",
+  "session_id": "720554592dbf4aed8a7c9f335157bef4",
   "intent": "draft_report",
   "answer": "Clinical draft report\nPatient: unassigned\n\nFindings:\n1. upper left first molar (FDI 26, Universal 14): caries on the upper left first molar [classification: caries; certainty: uncertain]\n   Evidence: \"Possibly caries on the upper left first molar\"\n\nDRAFT - requires clinician review. Not a final diagnosis.",
   "data": {
-    "report_id": "draft-74739c79-88d0-408d-a5f5-5497dc81e953",
+    "report_id": "draft-1842968d-dfd7-49f0-8c39-082b79d70354",
     "patient_id": null,
     "status": "draft",
     "requires_clinician_review": true,
@@ -925,7 +925,7 @@ HTTP 200
   },
   "sources": [
     {
-      "report_id": "draft-74739c79-88d0-408d-a5f5-5497dc81e953",
+      "report_id": "draft-1842968d-dfd7-49f0-8c39-082b79d70354",
       "patient_id": null,
       "fields": [
         "transcript",
@@ -942,7 +942,7 @@ HTTP 200
   "provider_used": "rule",
   "stt_provider": null,
   "transcript": "Possibly caries on the upper left first molar",
-  "latency_ms": 1,
+  "latency_ms": 0,
   "warnings": []
 }
 ```
@@ -950,7 +950,7 @@ HTTP 200
 ## Assistant cannot approve
 
 ```bash
-curl -sS -X POST http://127.0.0.1:8000/draft/draft-ad11e2f7-36e9-4169-bff0-a83afc74ab59/approve -H 'X-User-Role: assistant'
+curl -sS -X POST http://127.0.0.1:8000/draft/draft-37928642-e09f-430b-b64f-9e1a138a5944/approve -H 'X-User-Role: assistant'
 ```
 
 HTTP 403
@@ -964,7 +964,7 @@ HTTP 403
 ## Dentist approves the draft
 
 ```bash
-curl -sS -X POST http://127.0.0.1:8000/draft/draft-ad11e2f7-36e9-4169-bff0-a83afc74ab59/approve -H 'X-User-Role: dentist'
+curl -sS -X POST http://127.0.0.1:8000/draft/draft-37928642-e09f-430b-b64f-9e1a138a5944/approve -H 'X-User-Role: dentist'
 ```
 
 HTTP 200
@@ -972,7 +972,7 @@ HTTP 200
 ```json
 {
   "data": {
-    "report_id": "draft-ad11e2f7-36e9-4169-bff0-a83afc74ab59",
+    "report_id": "draft-37928642-e09f-430b-b64f-9e1a138a5944",
     "patient_id": null,
     "status": "approved",
     "requires_clinician_review": false,

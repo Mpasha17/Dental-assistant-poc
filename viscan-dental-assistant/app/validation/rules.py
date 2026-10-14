@@ -10,7 +10,9 @@ from pydantic import ValidationError
 
 from app.llm.base import ToolCall
 from app.llm.rule_based import (
+    GREETING_REPLY,
     extract_name,
+    is_greeting,
     is_confirmation,
     looks_like_new_request,
     parse_booking,
@@ -270,6 +272,12 @@ def _route_open_report_summary(text: str, call: ToolCall, session: Session) -> T
     return ToolCall("summarize_report", {"report_id": session.report_id, "pronoun": pronoun_of(text)})
 
 
+def greeting_outcome() -> Outcome:
+    """Small talk gets a friendly reply. No tool runs and the session is left as it was."""
+
+    return Outcome(handled=True, intent="greeting", answer=GREETING_REPLY)
+
+
 def validate_call(call: ToolCall, text: str, session: Session, role: str) -> Outcome:
     """Apply allow-list, confirmation, patient resolution, and schema checks.
 
@@ -279,6 +287,8 @@ def validate_call(call: ToolCall, text: str, session: Session, role: str) -> Out
     """
 
     del role  # Authorization for approval lives on the approve route.
+    if is_greeting(text):
+        return greeting_outcome()
     warnings: list[str] = []
     resumed = _resume_pending(text, session)
     if looks_like_new_request(text):
