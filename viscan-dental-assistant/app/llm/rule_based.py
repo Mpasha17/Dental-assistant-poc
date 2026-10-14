@@ -54,6 +54,19 @@ _CARIES_RE = re.compile(
 )
 
 
+_FDI_RE = re.compile(r"(?:\b(?:tooth|fdi)\s*#?\s*|#\s*|\b)([1-4][1-8])\b", re.IGNORECASE)
+
+
+def find_fdi(text: str) -> str | None:
+    """A spoken FDI number such as 'tooth 36' or '#36'. Only 11-18, 21-28, 31-38, 41-48."""
+
+    labeled = re.search(r"(?:\b(?:tooth|fdi)\s*#?\s*|#\s*)([1-4][1-8])\b", text, re.IGNORECASE)
+    if labeled:
+        return labeled.group(1)
+    bare = _FDI_RE.search(text)
+    return bare.group(1) if bare else None
+
+
 def is_confirmation(text: str) -> bool:
     """True only for an explicit confirmation such as 'yes, confirm'."""
 
@@ -99,7 +112,7 @@ def is_dictation(text: str) -> bool:
     return bool(
         re.search(
             r"\b(impacted|impaction|caries|carious|radiolucency|radiolucent|periapical|"
-            r"mesioangular|distoangular|horizontally|vertically)\b",
+            r"mesioangular|distoangular|horizontally|vertically|bone\s+loss|fracture|lesion)\b",
             text,
             re.IGNORECASE,
         )
@@ -118,9 +131,22 @@ def pronoun_of(text: str) -> str | None:
     return "their"
 
 
+# Command words that often sit in front of a spoken name ("show me pryia sharma's opg").
+_FILLER = {"show", "me", "open", "get", "pull", "up", "please", "the", "latest", "report"}
+
+
+def strip_filler(raw: str) -> str:
+    """Drop leading command and filler words before a name is read."""
+
+    tokens = raw.split()
+    while tokens and tokens[0].lower().strip(".,") in _FILLER:
+        tokens.pop(0)
+    return " ".join(tokens)
+
+
 def _trim_name(raw: str) -> str:
     kept: list[str] = []
-    for token in raw.split():
+    for token in strip_filler(raw).split():
         if token.lower().strip(".,") in _NAME_STOP:
             break
         kept.append(token.strip(".,"))
@@ -233,9 +259,12 @@ def _parse_sentence(sentence: str) -> dict[str, Any] | None:
             "certainty": "uncertain" if hedge_in(text) else "stated",
             "evidence_span": text if text in sentence or text in sentence.strip() else sentence.strip(),
         }
+    fdi = find_fdi(text)
     caries = _CARIES_RE.search(text)
     if caries:
         site = re.sub(r"\s+", " ", (caries.group("site") or "")).strip(" .,-")
+        if not site and fdi:
+            site = f"tooth {fdi}"
         description = site or "unspecified site"
         finding = f"caries on the {description}" if site else "caries"
         return {
@@ -246,10 +275,18 @@ def _parse_sentence(sentence: str) -> dict[str, Any] | None:
             "evidence_span": text,
         }
     site_match = _SITE_RE.search(text)
-    if site_match and re.search(r"\b(lesion|fracture|missing|restoration|radiolucency|unerupted)\b", text, re.I):
+    if site_match and re.search(r"\b(lesion|fracture|missing|restoration|radiolucency|unerupted|bone\s+loss)\b", text, re.I):
         return {
             "finding": text.rstrip("."),
             "anatomical_site": {"description": site_match.group(1)},
+            "classification": None,
+            "certainty": "uncertain" if hedge_in(text) else "stated",
+            "evidence_span": text,
+        }
+    if fdi and re.search(r"\b(lesion|fracture|missing|restoration|radiolucency|unerupted|impacted|bone\s+loss)\b", text, re.I):
+        return {
+            "finding": text.rstrip("."),
+            "anatomical_site": {"description": f"tooth {fdi}"},
             "classification": None,
             "certainty": "uncertain" if hedge_in(text) else "stated",
             "evidence_span": text,

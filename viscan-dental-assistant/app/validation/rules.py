@@ -2,13 +2,20 @@
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
 from typing import Any
 
 from pydantic import ValidationError
 
 from app.llm.base import ToolCall
-from app.llm.rule_based import is_confirmation, looks_like_new_request, parse_booking, pronoun_of
+from app.llm.rule_based import (
+    extract_name,
+    is_confirmation,
+    looks_like_new_request,
+    parse_booking,
+    pronoun_of,
+)
 from app.schemas import TOOL_ARG_MODELS
 from app.session import Session
 from app.tools.patients import (
@@ -242,6 +249,27 @@ def _fill_report_from_patient(call: ToolCall) -> Outcome | None:
     return None
 
 
+_SUMMARY_OF_OPEN_REPORT = re.compile(
+    r"\b(summari[sz]e|sum\s+up|summary\s+of)\b.*\b(her|his|their|the|this|that)\s+"
+    r"(?:latest\s+|current\s+|open\s+)?(report|opg|iopa|cbct|bitewing|scan|x-?ray)\b",
+    re.IGNORECASE,
+)
+
+
+def _route_open_report_summary(text: str, call: ToolCall, session: Session) -> ToolCall:
+    """'Summarize her report' with a report already open always summarizes that report.
+
+    Models sometimes answer this with list_reports. The open report wins unless
+    the user names a different patient.
+    """
+
+    if not session.report_id or not _SUMMARY_OF_OPEN_REPORT.search(text) or extract_name(text):
+        return call
+    if call.name == "summarize_report" and call.arguments.get("report_id") == session.report_id:
+        return call
+    return ToolCall("summarize_report", {"report_id": session.report_id, "pronoun": pronoun_of(text)})
+
+
 def validate_call(call: ToolCall, text: str, session: Session, role: str) -> Outcome:
     """Apply allow-list, confirmation, patient resolution, and schema checks.
 
@@ -284,6 +312,7 @@ def validate_call(call: ToolCall, text: str, session: Session, role: str) -> Out
         )
     else:
         call = _reject_unconfirmed_booking(text, call, warnings)
+        call = _route_open_report_summary(text, call, session)
 
     if call.name == "unknown" or call.name not in ALLOWED_TOOLS:
         if call.arguments.get("reason") == "confirmation_required":

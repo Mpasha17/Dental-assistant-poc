@@ -102,7 +102,15 @@ for group in _SYNONYM_GROUPS:
         _SYNONYMS[token] = group
 
 _HEDGES = (
+    "may",
     "maybe",
+    "probably",
+    "probable",
+    "likely",
+    "suspicious for",
+    "cannot rule out",
+    "cant rule out",
+    "query",
     "possibly",
     "possible",
     "looks like",
@@ -200,16 +208,47 @@ def hedge_in(text: str) -> bool:
     return False
 
 
+def _sentences(transcript: str) -> list[tuple[int, int, str]]:
+    """Sentence slices of the transcript with their character offsets.
+
+    The terminator stays with its sentence, so "caries?" still reads as a hedge.
+    """
+
+    spans: list[tuple[int, int, str]] = []
+    start = 0
+    for match in re.finditer(r"[.!?;\n]+", transcript):
+        end = match.end()
+        if transcript[start:end].strip():
+            spans.append((start, end, transcript[start:end]))
+        start = end
+    if transcript[start:].strip():
+        spans.append((start, len(transcript), transcript[start:]))
+    return spans
+
+
+def sentence_for_span(transcript: str, span: str) -> str:
+    """The transcript sentence(s) that contain the evidence span."""
+
+    if not span:
+        return transcript
+    index = transcript.lower().find(span.lower())
+    if index < 0:
+        span_norm = normalize(span)
+        for _, _, sentence in _sentences(transcript):
+            if span_norm and span_norm in normalize(sentence):
+                return sentence
+        return span
+    end = index + len(span)
+    covering = [text for start, stop, text in _sentences(transcript) if start < end and stop > index]
+    return " ".join(covering) if covering else span
+
+
 def certainty_for(transcript: str, finding: dict[str, Any]) -> str:
-    """Uncertain wording forces certainty='uncertain'. Otherwise the finding is stated."""
+    """Hedge wording anywhere in the evidence sentence forces certainty='uncertain'."""
 
     span = str(finding.get("evidence_span") or "")
-    window = transcript
-    if span:
-        index = transcript.lower().find(span.lower())
-        if index >= 0:
-            window = transcript[max(0, index - 48) : index + len(span)]
-    if hedge_in(window) or hedge_in(span):
+    sentence = sentence_for_span(transcript, span)
+    if hedge_in(sentence) or hedge_in(span) or "?" in sentence or "?" in span:
         return "uncertain"
     return "stated"
 

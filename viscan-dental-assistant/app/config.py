@@ -12,16 +12,21 @@ ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = ROOT / "data"
 STATIC_DIR = ROOT / "static"
 ENV_PATH = ROOT / ".env"
+DEFAULT_GROQ_MODEL = "openai/gpt-oss-120b"
 
 
-def load_dotenv_file(path: Path = ENV_PATH) -> None:
+def load_dotenv_file(path: Path = ENV_PATH) -> list[str]:
     """Fill missing environment variables from a local .env file.
 
     Existing variables win, so tests and the shell can override the file.
+    Returns the keys whose .env value was ignored because the process
+    environment already held a different value. A stale `export GROQ_MODEL=...`
+    in the launching shell is the usual cause of /health disagreeing with .env.
     """
 
+    shadowed: list[str] = []
     if not path.is_file():
-        return
+        return shadowed
     for raw in path.read_text(encoding="utf-8").splitlines():
         line = raw.strip()
         if not line or line.startswith("#") or "=" not in line:
@@ -29,8 +34,13 @@ def load_dotenv_file(path: Path = ENV_PATH) -> None:
         key, value = line.split("=", 1)
         key = key.strip()
         value = value.strip().strip('"').strip("'")
-        if key:
-            os.environ.setdefault(key, value)
+        if not key:
+            continue
+        current = os.environ.get(key)
+        if current is not None and current != value:
+            shadowed.append(key)
+        os.environ.setdefault(key, value)
+    return shadowed
 
 
 def _env(name: str, default: str) -> str:
@@ -71,7 +81,14 @@ class Settings:
 def load_settings() -> Settings:
     """Read settings from the environment, after applying .env defaults."""
 
-    load_dotenv_file()
+    shadowed = load_dotenv_file()
+    if shadowed:
+        # Names only; values can be secrets.
+        import logging
+
+        logging.getLogger("viscan").warning(
+            "env_overrides_dotenv keys=%s", ",".join(sorted(set(shadowed)))
+        )
     try:
         timeout = float(_env("LLM_TIMEOUT_S", "15"))
     except ValueError:
@@ -87,7 +104,7 @@ def load_settings() -> Settings:
         mistral_api_key=_env("MISTRAL_API_KEY", ""),
         mistral_model=_env("MISTRAL_MODEL", "mistral-small-latest"),
         groq_api_key=_env("GROQ_API_KEY", ""),
-        groq_model=_env("GROQ_MODEL", "llama-3.3-70b-versatile"),
+        groq_model=_env("GROQ_MODEL", DEFAULT_GROQ_MODEL),
         groq_whisper_model=_env("GROQ_WHISPER_MODEL", "whisper-large-v3-turbo"),
         stt_provider=_env("STT_PROVIDER", "groq").lower(),
         local_whisper_model=_env("LOCAL_WHISPER_MODEL", "base.en"),

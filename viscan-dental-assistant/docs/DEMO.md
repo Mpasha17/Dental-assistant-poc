@@ -23,17 +23,17 @@ HTTP 200
   "status": "ok",
   "llm_provider": "rule",
   "stt_provider": "mock",
-  "gemini_model": "gemini-2.5-flash",
+  "gemini_model": "gemini-3.1-flash-lite",
   "mistral_model": "mistral-small-latest",
-  "groq_model": "llama-3.3-70b-versatile",
+  "groq_model": "openai/gpt-oss-120b",
   "groq_whisper_model": "whisper-large-v3-turbo",
   "local_whisper_model": "base.en",
   "llm_timeout_s": 15.0,
   "demo_date": "2026-10-14",
   "keys": {
-    "gemini": false,
-    "mistral": false,
-    "groq": false
+    "gemini": true,
+    "mistral": true,
+    "groq": true
   }
 }
 ```
@@ -136,7 +136,7 @@ HTTP 200
 
 ```json
 {
-  "session_id": "fad4e585729d476d999117b9b3b8eb1b",
+  "session_id": "be2ca8fb43d5432a9667656afd0a71e7",
   "intent": "retrieve_report",
   "answer": "Rahul Verma's latest OPG report is R007 dated 2026-08-19.\nClinician: Dr. Sameer Qureshi\nFindings:\n- Lower right third molar is horizontally impacted (FDI 48)\n- Mild bone loss around the lower incisors\nImpression: Horizontal impaction of the mandibular right third molar. Mild mandibular anterior bone loss.",
   "data": {
@@ -206,7 +206,7 @@ HTTP 200
   "provider_used": "rule",
   "stt_provider": null,
   "transcript": null,
-  "latency_ms": 1,
+  "latency_ms": 2,
   "warnings": []
 }
 ```
@@ -433,7 +433,7 @@ HTTP 200
 
 ```json
 {
-  "session_id": "93d25b4f7ab242de848f0b6c9d2728b9",
+  "session_id": "bf19865e79ab434c99704b982dc46215",
   "intent": "missing_report",
   "answer": "No OPG report found for Kavya Reddy. Available reports: CBCT (2026-09-01, R017), Bitewing (2026-06-18, R016), IOPA (2026-06-18, R015).",
   "data": {
@@ -654,7 +654,7 @@ HTTP 200
   "provider_used": "rule",
   "stt_provider": null,
   "transcript": null,
-  "latency_ms": 0,
+  "latency_ms": 1,
   "warnings": []
 }
 ```
@@ -768,7 +768,7 @@ HTTP 200
 
 ```json
 {
-  "session_id": "f5c5f51369324648bac2638bc27e33c1",
+  "session_id": "53895fcaa1f547ab8a63cf11dd1dfd8d",
   "intent": "clarify_patient",
   "answer": "Which patient's report should I use?",
   "data": null,
@@ -832,11 +832,11 @@ HTTP 200
 
 ```json
 {
-  "session_id": "9073d0cadf01467d8466e18049514d7c",
+  "session_id": "8537e1e76224400a81dcc24f25e9dfe5",
   "intent": "draft_report",
-  "answer": "CLINICAL DRAFT REPORT\nPatient: unassigned\n\nFindings:\n1. Lower right third molar (FDI 48, Universal 32): Lower right third molar is horizontally impacted [classification: horizontal; certainty: stated]\n   Evidence: \"Lower right third molar is horizontally impacted\"\n\nDRAFT - requires clinician review. Not a final diagnosis.",
+  "answer": "Clinical draft report\nPatient: unassigned\n\nFindings:\n1. Lower right third molar (FDI 48, Universal 32): Lower right third molar is horizontally impacted [classification: horizontal; certainty: stated]\n   Evidence: \"Lower right third molar is horizontally impacted\"\n\nDRAFT - requires clinician review. Not a final diagnosis.",
   "data": {
-    "report_id": "draft-8a9b116b-9cc6-4ae3-a573-abff94989a44",
+    "report_id": "draft-ad11e2f7-36e9-4169-bff0-a83afc74ab59",
     "patient_id": null,
     "status": "draft",
     "requires_clinician_review": true,
@@ -855,14 +855,14 @@ HTTP 200
         "evidence_span": "Lower right third molar is horizontally impacted"
       }
     ],
-    "draft_text": "CLINICAL DRAFT REPORT\nPatient: unassigned\n\nFindings:\n1. Lower right third molar (FDI 48, Universal 32): Lower right third molar is horizontally impacted [classification: horizontal; certainty: stated]\n   Evidence: \"Lower right third molar is horizontally impacted\"\n\nDRAFT - requires clinician review. Not a final diagnosis.",
+    "draft_text": "Clinical draft report\nPatient: unassigned\n\nFindings:\n1. Lower right third molar (FDI 48, Universal 32): Lower right third molar is horizontally impacted [classification: horizontal; certainty: stated]\n   Evidence: \"Lower right third molar is horizontally impacted\"\n\nDRAFT - requires clinician review. Not a final diagnosis.",
     "warnings": [],
     "unsupported_claims_removed": [],
     "transcript": "Lower right third molar is horizontally impacted"
   },
   "sources": [
     {
-      "report_id": "draft-8a9b116b-9cc6-4ae3-a573-abff94989a44",
+      "report_id": "draft-ad11e2f7-36e9-4169-bff0-a83afc74ab59",
       "patient_id": null,
       "fields": [
         "transcript",
@@ -895,11 +895,11 @@ HTTP 200
 
 ```json
 {
-  "session_id": "f0f40f4a6b1f40298be8de61d74bbd9e",
+  "session_id": "bd9e0a27be494a2f81fcb18093afd630",
   "intent": "draft_report",
-  "answer": "CLINICAL DRAFT REPORT\nPatient: unassigned\n\nFindings:\n1. upper left first molar (FDI 26, Universal 14): caries on the upper left first molar [classification: caries; certainty: uncertain]\n   Evidence: \"Possibly caries on the upper left first molar\"\n\nDRAFT - requires clinician review. Not a final diagnosis.",
+  "answer": "Clinical draft report\nPatient: unassigned\n\nFindings:\n1. upper left first molar (FDI 26, Universal 14): caries on the upper left first molar [classification: caries; certainty: uncertain]\n   Evidence: \"Possibly caries on the upper left first molar\"\n\nDRAFT - requires clinician review. Not a final diagnosis.",
   "data": {
-    "report_id": "draft-57960a37-4368-4333-943b-cd10e7ff6837",
+    "report_id": "draft-74739c79-88d0-408d-a5f5-5497dc81e953",
     "patient_id": null,
     "status": "draft",
     "requires_clinician_review": true,
@@ -918,14 +918,14 @@ HTTP 200
         "evidence_span": "Possibly caries on the upper left first molar"
       }
     ],
-    "draft_text": "CLINICAL DRAFT REPORT\nPatient: unassigned\n\nFindings:\n1. upper left first molar (FDI 26, Universal 14): caries on the upper left first molar [classification: caries; certainty: uncertain]\n   Evidence: \"Possibly caries on the upper left first molar\"\n\nDRAFT - requires clinician review. Not a final diagnosis.",
+    "draft_text": "Clinical draft report\nPatient: unassigned\n\nFindings:\n1. upper left first molar (FDI 26, Universal 14): caries on the upper left first molar [classification: caries; certainty: uncertain]\n   Evidence: \"Possibly caries on the upper left first molar\"\n\nDRAFT - requires clinician review. Not a final diagnosis.",
     "warnings": [],
     "unsupported_claims_removed": [],
     "transcript": "Possibly caries on the upper left first molar"
   },
   "sources": [
     {
-      "report_id": "draft-57960a37-4368-4333-943b-cd10e7ff6837",
+      "report_id": "draft-74739c79-88d0-408d-a5f5-5497dc81e953",
       "patient_id": null,
       "fields": [
         "transcript",
@@ -942,7 +942,7 @@ HTTP 200
   "provider_used": "rule",
   "stt_provider": null,
   "transcript": "Possibly caries on the upper left first molar",
-  "latency_ms": 0,
+  "latency_ms": 1,
   "warnings": []
 }
 ```
@@ -950,7 +950,7 @@ HTTP 200
 ## Assistant cannot approve
 
 ```bash
-curl -sS -X POST http://127.0.0.1:8000/draft/draft-8a9b116b-9cc6-4ae3-a573-abff94989a44/approve -H 'X-User-Role: assistant'
+curl -sS -X POST http://127.0.0.1:8000/draft/draft-ad11e2f7-36e9-4169-bff0-a83afc74ab59/approve -H 'X-User-Role: assistant'
 ```
 
 HTTP 403
@@ -964,7 +964,7 @@ HTTP 403
 ## Dentist approves the draft
 
 ```bash
-curl -sS -X POST http://127.0.0.1:8000/draft/draft-8a9b116b-9cc6-4ae3-a573-abff94989a44/approve -H 'X-User-Role: dentist'
+curl -sS -X POST http://127.0.0.1:8000/draft/draft-ad11e2f7-36e9-4169-bff0-a83afc74ab59/approve -H 'X-User-Role: dentist'
 ```
 
 HTTP 200
@@ -972,7 +972,7 @@ HTTP 200
 ```json
 {
   "data": {
-    "report_id": "draft-8a9b116b-9cc6-4ae3-a573-abff94989a44",
+    "report_id": "draft-ad11e2f7-36e9-4169-bff0-a83afc74ab59",
     "patient_id": null,
     "status": "approved",
     "requires_clinician_review": false,
@@ -991,7 +991,7 @@ HTTP 200
         "evidence_span": "Lower right third molar is horizontally impacted"
       }
     ],
-    "draft_text": "CLINICAL DRAFT REPORT\nPatient: unassigned\n\nFindings:\n1. Lower right third molar (FDI 48, Universal 32): Lower right third molar is horizontally impacted [classification: horizontal; certainty: stated]\n   Evidence: \"Lower right third molar is horizontally impacted\"\n\nDRAFT - requires clinician review. Not a final diagnosis.",
+    "draft_text": "Clinical draft report\nPatient: unassigned\n\nFindings:\n1. Lower right third molar (FDI 48, Universal 32): Lower right third molar is horizontally impacted [classification: horizontal; certainty: stated]\n   Evidence: \"Lower right third molar is horizontally impacted\"\n\nDRAFT - requires clinician review. Not a final diagnosis.",
     "warnings": [],
     "unsupported_claims_removed": [],
     "transcript": "Lower right third molar is horizontally impacted",

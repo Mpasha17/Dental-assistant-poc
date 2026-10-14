@@ -75,6 +75,7 @@
     .mic.recording { background: var(--coral); color: white; }
     .dictation { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 16px; }
     textarea { min-height: 180px; width: 100%; resize: vertical; }
+    #draft-text { text-transform: none; letter-spacing: normal; font-size: 13px; color: var(--ink); }
     pre { margin: 0; white-space: pre-wrap; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; }
     .warn { color: var(--amber); }
     @media (max-width: 800px) {
@@ -126,7 +127,7 @@
             <textarea id="dictation-text">Lower right third molar is horizontally impacted</textarea>
           </label>
           <div class="composer" style="border: 0; padding: 12px 0 0;">
-            <input id="dictation-patient" placeholder="Patient id, optional (P003)" />
+            <input id="dictation-patient" placeholder="Patient id, optional, e.g. P003" />
             <button class="send" id="draft-btn" type="button">Draft</button>
             <button class="ghost" id="approve-btn" type="button">Approve</button>
           </div>
@@ -169,13 +170,30 @@
       if (payload.session_id) sessionEl.value = payload.session_id;
     }
 
-    function renderSources(sources) {
+    function renderSources(sources, heading) {
       if (!sources || !sources.length) return "";
       const items = sources.map((source) => {
         const quotes = (source.quotes || []).map((quote) => `<div>“${quote}”</div>`).join("");
         return `<article><strong>${source.report_id || "source"}</strong> · ${source.patient_id || "no patient"}<br>${(source.fields || []).join(", ")}${quotes}</article>`;
       }).join("");
-      return `<div class="sources"><strong>Sources</strong>${items}</div>`;
+      return `<div class="sources"><strong>${heading || "Sources"}</strong>${items}</div>`;
+    }
+
+    function renderAvailable(reports) {
+      if (!reports || !reports.length) return "";
+      const items = reports.map((report) =>
+        `<article><strong>${report.type}</strong> · ${report.date} · ${report.id}</article>`
+      ).join("");
+      return `<div class="sources"><strong>Available reports</strong>${items}</div>`;
+    }
+
+    function renderPayloadRefs(payload) {
+      if (!payload) return "";
+      // A missing report has no evidence; list what exists instead of calling it a source.
+      if (payload.intent === "missing_report") {
+        return renderAvailable(payload.data && payload.data.available_reports);
+      }
+      return renderSources(payload.sources);
     }
 
     function addBubble(kind, title, payload) {
@@ -185,7 +203,7 @@
       const options = (payload && payload.clarification_options || []).map((option) =>
         `<button type="button" data-name="${option.full_name}">${option.full_name} · born ${option.dob_year} · visit ${option.last_visit}</button>`
       ).join("");
-      node.innerHTML = `${title}${warnings}${options ? `<div class="options">${options}</div>` : ""}${payload ? renderSources(payload.sources) : ""}`;
+      node.innerHTML = `${title}${warnings}${options ? `<div class="options">${options}</div>` : ""}${renderPayloadRefs(payload)}`;
       if (payload) {
         const meta = document.createElement("div");
         meta.className = "meta";
@@ -382,14 +400,17 @@
     mic.addEventListener("pointerup", stopMic);
     mic.addEventListener("pointercancel", stopMic);
 
+    let lastProvider = "";
+
     function showDraft(payload) {
       const draft = payload.data || payload;
+      if (payload.provider_used) lastProvider = payload.provider_used;
       draftId = draft.report_id;
       document.querySelector("#findings-json").value = JSON.stringify(draft.findings || [], null, 2);
       document.querySelector("#draft-text").textContent = draft.draft_text || "";
       const removed = (draft.unsupported_claims_removed || []).join("; ");
       document.querySelector("#dictation-status").textContent =
-        `${draft.status} · review ${draft.requires_clinician_review} · ${payload.provider_used || ""}` +
+        `${draft.status} · review ${draft.requires_clinician_review} · ${payload.provider_used || lastProvider}` +
         (removed ? ` · removed: ${removed}` : "");
     }
 
@@ -414,16 +435,28 @@
 
     document.querySelector("#save-findings").addEventListener("click", async () => {
       if (!draftId) return;
+      const status = document.querySelector("#dictation-status");
+      let findings;
+      try {
+        findings = JSON.parse(document.querySelector("#findings-json").value || "[]");
+      } catch (error) {
+        status.textContent = "Edits not saved: findings JSON is not valid (" + error.message + ")";
+        status.classList.add("warn");
+        return;
+      }
       const response = await fetch("/draft/" + draftId, {
         method: "PUT",
         headers: headers(),
-        body: JSON.stringify({ findings: JSON.parse(document.querySelector("#findings-json").value || "[]") })
+        body: JSON.stringify({ findings })
       });
       const payload = await response.json();
       if (!response.ok) {
-        document.querySelector("#dictation-status").textContent = payload.error || "Save failed";
+        // Keep the clinician's text in the editor so the mistake can be fixed.
+        status.textContent = "Edits not saved: " + (payload.detail || payload.error || "Save failed");
+        status.classList.add("warn");
         return;
       }
+      status.classList.remove("warn");
       showDraft(payload);
     });
 

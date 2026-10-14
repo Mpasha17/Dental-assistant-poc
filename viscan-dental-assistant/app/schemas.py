@@ -41,6 +41,18 @@ class DictationRequest(BaseModel):
 class DraftUpdateRequest(BaseModel):
     findings: list[dict[str, Any]] = Field(min_length=0)
 
+    @field_validator("findings")
+    @classmethod
+    def _certainty_is_known(cls, findings: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        allowed = ("stated", "uncertain")
+        for index, finding in enumerate(findings, start=1):
+            value = finding.get("certainty")
+            if value is not None and value not in allowed:
+                raise ValueError(
+                    f"finding {index} has certainty {value!r}; use 'stated' or 'uncertain'"
+                )
+        return findings
+
 
 class Source(BaseModel):
     report_id: str | None = None

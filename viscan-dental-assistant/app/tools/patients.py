@@ -68,6 +68,24 @@ class ResolveResult:
         return None
 
 
+_TOKEN_THRESHOLD = 80
+
+
+def _token_matches(query: str, roster: list[dict[str, Any]]) -> list[tuple[float, dict[str, Any]]]:
+    """Match each spoken token to a name part, so a misheard word order or typo still resolves."""
+
+    words = query.split()
+    if not words:
+        return []
+    scored: list[tuple[float, dict[str, Any]]] = []
+    for patient in roster:
+        parts = normalize_name(patient["full_name"]).split()
+        best = [max(float(fuzz.ratio(word, part)) for part in parts) for word in words]
+        if min(best) >= _TOKEN_THRESHOLD:
+            scored.append((sum(best) / len(best), patient))
+    return scored
+
+
 def resolve_patient(name: str) -> ResolveResult:
     """Resolve a spoken name.
 
@@ -117,6 +135,8 @@ def resolve_patient(name: str) -> ResolveResult:
             score = float(fuzz.partial_ratio(query, normalize_name(patient["first_name"])))
             if score >= _MATCH_THRESHOLD:
                 scored.append((score, patient))
+    if not scored:
+        scored = _token_matches(query, roster)
     if not scored:
         return ResolveResult("none", [])
     scored.sort(key=lambda item: (-item[0], item[1]["id"]))

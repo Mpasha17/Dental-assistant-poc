@@ -48,7 +48,7 @@ That runs pytest with `LLM_PROVIDER=rule` and `STT_PROVIDER=mock`. No network an
 | Provider | Where to get a key | Used for |
 |---|---|---|
 | Gemini | https://aistudio.google.com/apikey | Default interpreter, model `gemini-3.1-flash-lite` |
-| Groq | https://console.groq.com | Optional interpreter `llama-3.3-70b-versatile`, and Whisper `whisper-large-v3-turbo` |
+| Groq | https://console.groq.com | Optional interpreter `openai/gpt-oss-120b`, and Whisper `whisper-large-v3-turbo` |
 | Mistral | https://console.mistral.ai | Optional interpreter `mistral-small-latest` on the Experiment plan |
 
 `faster-whisper` is the offline speech fallback. It is not installed by `requirements.txt`. Install it with `pip install -r requirements-optional.txt` and set `STT_PROVIDER=local`.
@@ -65,7 +65,7 @@ Google's free tier may use prompts to improve products. That is acceptable here 
 | `MISTRAL_API_KEY` | empty | Mistral key |
 | `MISTRAL_MODEL` | `mistral-small-latest` | Mistral model id |
 | `GROQ_API_KEY` | empty | Groq key, shared by chat and Whisper |
-| `GROQ_MODEL` | `llama-3.3-70b-versatile` | Groq chat model |
+| `GROQ_MODEL` | `openai/gpt-oss-120b` | Groq chat model |
 | `STT_PROVIDER` | `groq` | `groq`, `local`, or `mock` |
 | `LOCAL_WHISPER_MODEL` | `base.en` | faster-whisper model name |
 | `LLM_TIMEOUT_S` | `15` | Hosted-model timeout before the rule fallback |
@@ -104,6 +104,9 @@ cli.py          terminal chat
 - Tooth numbers are derived from phrases such as "lower right third molar" or from an FDI number that was actually said. Unusual shorthand may stay unnumbered.
 - Dictation grounding is lexical. A paraphrase that does not share terms with the transcript is removed, even when a clinician would accept it.
 - Hosted providers were implemented against the current SDKs and were not called during tests, because tests are not allowed to use the network.
+- Certainty is decided by a fixed hedge list ("may", "possibly", "likely", "cannot rule out", a question mark, and similar) applied to the sentence that holds the evidence. Hedges outside that list are read as stated, and the word "may" is treated as a hedge even when it is the month.
+- Mistral 429 responses are retried twice (1.5 s, then 3 s) before the rule parser takes over, so a rate-limited request can take several seconds longer. Other providers retry only a transient "unavailable" response once.
+- Settings already present in the shell environment win over `.env`. A stale `export GROQ_MODEL=...` will shadow the file; the server logs `env_overrides_dotenv` with the key names when that happens.
 - The microphone button needs a browser that allows `getUserMedia`. Transcription still needs `STT_PROVIDER=groq` and a Groq key, or `local`.
 
 ## What I would improve

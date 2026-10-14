@@ -69,7 +69,7 @@ def render_draft_text(patient_name: str | None, findings: list[dict[str, Any]]) 
     """Build the readable report from validated findings only."""
 
     lines = [
-        "CLINICAL DRAFT REPORT",
+        "Clinical draft report",
         f"Patient: {patient_name or 'unassigned'}",
         "",
         "Findings:",
