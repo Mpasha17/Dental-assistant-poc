@@ -245,3 +245,32 @@ def test_non_greetings_are_not_greetings():
     assert not is_greeting("hi, open Priya's latest OPG report")
     assert not is_greeting("Hilda")
     assert not is_greeting("")
+
+
+class _ListingRouter:
+    used_fallback = False
+
+    def interpret(self, text, context, tools):
+        return ToolCall("list_reports", {"name": "Priya Sharma"}), "fake"
+
+    def generate(self, prompt, schema):
+        raise AssertionError("not used")
+
+
+def test_show_named_opg_opens_report_even_if_model_lists(monkeypatch, client):
+    monkeypatch.setattr("app.llm.router.get_llm_router", lambda: _ListingRouter())
+    body = client.post("/chat", json={"session_id": "s4", "text": "show me pryia sharma's opg"}).json()
+    assert body["intent"] == "retrieve_report"
+    assert body["data"]["report"]["id"] == "R002"
+    summary = client.post("/chat", json={"session_id": "s4", "text": "summarize her report"}).json()
+    assert summary["intent"] == "summarize_report"
+    assert summary["data"]["report_id"] == "R002"
+
+
+def test_summary_with_only_patient_in_context_uses_latest(monkeypatch, client):
+    monkeypatch.setattr("app.llm.router.get_llm_router", lambda: _ListingRouter())
+    listed = client.post("/chat", json={"session_id": "s5", "text": "what reports does Priya Sharma have"}).json()
+    assert listed["intent"] == "list_reports"
+    summary = client.post("/chat", json={"session_id": "s5", "text": "summarize her report"}).json()
+    assert summary["intent"] == "summarize_report"
+    assert summary["data"]["report_id"] == "R002"

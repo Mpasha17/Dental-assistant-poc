@@ -17,7 +17,9 @@ from app.llm.rule_based import (
     looks_like_new_request,
     parse_booking,
     pronoun_of,
+    which_report,
 )
+from app.validation.report_types import detect_report_type
 from app.schemas import TOOL_ARG_MODELS
 from app.session import Session
 from app.tools.patients import (
@@ -259,17 +261,45 @@ _SUMMARY_OF_OPEN_REPORT = re.compile(
 
 
 def _route_open_report_summary(text: str, call: ToolCall, session: Session) -> ToolCall:
-    """'Summarize her report' with a report already open always summarizes that report.
+    """'Summarize her report' in a session with a patient in context always summarizes.
 
-    Models sometimes answer this with list_reports. The open report wins unless
-    the user names a different patient.
+    Models sometimes answer this with list_reports. The open report wins; with
+    only a patient in context, that patient's latest report is used. A newly
+    named patient still goes through normal resolution.
     """
 
-    if not session.report_id or not _SUMMARY_OF_OPEN_REPORT.search(text) or extract_name(text):
+    if not _SUMMARY_OF_OPEN_REPORT.search(text) or extract_name(text):
         return call
-    if call.name == "summarize_report" and call.arguments.get("report_id") == session.report_id:
+    if session.report_id:
+        if call.name == "summarize_report" and call.arguments.get("report_id") == session.report_id:
+            return call
+        return ToolCall("summarize_report", {"report_id": session.report_id, "pronoun": pronoun_of(text)})
+    if session.patient_id:
+        latest = list_reports(session.patient_id)
+        if latest:
+            return ToolCall("summarize_report", {"report_id": latest[0]["id"], "pronoun": pronoun_of(text)})
+    return call
+
+
+_LISTING_WORDS = re.compile(r"\b(list|which|what|all|any)\b|\breports\b", re.IGNORECASE)
+_OPEN_ONE = re.compile(r"\b(open|show|get|fetch|view|display|retrieve|pull\s+up)\b", re.IGNORECASE)
+
+
+def _route_open_single_report(text: str, call: ToolCall) -> ToolCall:
+    """'Show me Priya Sharma's OPG' asks for one report, not the list of reports."""
+
+    if call.name != "list_reports" or _LISTING_WORDS.search(text) or not _OPEN_ONE.search(text):
         return call
-    return ToolCall("summarize_report", {"report_id": session.report_id, "pronoun": pronoun_of(text)})
+    report_type = detect_report_type(text)
+    if not report_type and not re.search(r"\breport\b", text, re.IGNORECASE):
+        return call
+    arguments = {
+        "name": call.arguments.get("name") or extract_name(text),
+        "patient_id": call.arguments.get("patient_id"),
+        "report_type": report_type or call.arguments.get("report_type"),
+        "which": which_report(text),
+    }
+    return ToolCall("get_report", {key: value for key, value in arguments.items() if value})
 
 
 def greeting_outcome() -> Outcome:
@@ -323,6 +353,7 @@ def validate_call(call: ToolCall, text: str, session: Session, role: str) -> Out
     else:
         call = _reject_unconfirmed_booking(text, call, warnings)
         call = _route_open_report_summary(text, call, session)
+        call = _route_open_single_report(text, call)
 
     if call.name == "unknown" or call.name not in ALLOWED_TOOLS:
         if call.arguments.get("reason") == "confirmation_required":
