@@ -1,0 +1,28 @@
+{
+  "prompt": "Dental radiology dictation. Expect molar, premolar, canine, incisor, OPG, panoramic, IOPA, periapical, CBCT, cone beam, bitewing, impacted, mesioangular, distoangular, horizontal, caries, restoration, radiolucency, and FDI tooth numbers.",
+  "terms": [
+    "molar",
+    "premolar",
+    "canine",
+    "incisor",
+    "OPG",
+    "panoramic",
+    "orthopantomogram",
+    "IOPA",
+    "periapical",
+    "CBCT",
+    "cone beam",
+    "bitewing",
+    "impacted",
+    "mesioangular",
+    "distoangular",
+    "caries",
+    "FDI"
+  ],
+  "report_type_synonyms": {
+    "OPG": ["opg", "panoramic", "pano", "orthopantomogram"],
+    "IOPA": ["iopa", "periapical x-ray", "periapical xray", "periapical radiograph"],
+    "CBCT": ["cbct", "cone beam ct", "cone-beam", "cone beam"],
+    "Bitewing": ["bitewing", "bite wing", "bite-wing"]
+  }
+}

@@ -1,0 +1,342 @@
+[
+  {
+    "id": "R001",
+    "patient_id": "P001",
+    "type": "OPG",
+    "date": "2026-04-10",
+    "clinician": "Dr. Neha Kapoor",
+    "findings": [
+      {
+        "description": "Mild generalized horizontal bone loss",
+        "site": "generalized alveolus",
+        "fdi_tooth": null,
+        "universal_tooth": null
+      },
+      {
+        "description": "Lower right third molar is unerupted and horizontally impacted",
+        "site": "lower right third molar",
+        "fdi_tooth": "48",
+        "universal_tooth": "32"
+      }
+    ],
+    "impression": "Unerupted horizontally impacted mandibular right third molar. Mild periodontal bone loss.",
+    "recommendations": [
+      "Clinical correlation for the periodontal bone loss.",
+      "Consider a surgical consult for tooth 48."
+    ]
+  },
+  {
+    "id": "R002",
+    "patient_id": "P001",
+    "type": "OPG",
+    "date": "2026-09-20",
+    "clinician": "Dr. Neha Kapoor",
+    "findings": [
+      {
+        "description": "Occlusal caries on the upper left first molar",
+        "site": "upper left first molar",
+        "fdi_tooth": "26",
+        "universal_tooth": "14"
+      },
+      {
+        "description": "Horizontal impaction of the lower right third molar is unchanged",
+        "site": "lower right third molar",
+        "fdi_tooth": "48",
+        "universal_tooth": "32"
+      }
+    ],
+    "impression": "Caries on the upper left first molar (FDI 26). Horizontal impaction of tooth 48 is unchanged from the April study.",
+    "recommendations": [
+      "Restore tooth 26.",
+      "Review the impaction of tooth 48."
+    ]
+  },
+  {
+    "id": "R003",
+    "patient_id": "P001",
+    "type": "IOPA",
+    "date": "2026-08-01",
+    "clinician": "Dr. Arjun Mehta",
+    "findings": [
+      {
+        "description": "Well-defined periapical radiolucency at the apex of the lower left first molar",
+        "site": "lower left first molar",
+        "fdi_tooth": "36",
+        "universal_tooth": "19"
+      }
+    ],
+    "impression": "Periapical radiolucency associated with tooth 36. Vitality testing is suggested.",
+    "recommendations": ["Endodontic assessment of tooth 36."]
+  },
+  {
+    "id": "R004",
+    "patient_id": "P002",
+    "type": "OPG",
+    "date": "2026-07-11",
+    "clinician": "Dr. Lila Fernandes",
+    "findings": [
+      {
+        "description": "Missing upper right third molar with a healed socket",
+        "site": "upper right third molar",
+        "fdi_tooth": "18",
+        "universal_tooth": "1"
+      },
+      {
+        "description": "Mucosal thickening of the right maxillary sinus",
+        "site": "right maxillary sinus",
+        "fdi_tooth": null,
+        "universal_tooth": null
+      }
+    ],
+    "impression": "Edentulous site at tooth 18. No acute osseous lesion identified on this panoramic view.",
+    "recommendations": ["No radiographic follow-up is required for the healed 18 site."]
+  },
+  {
+    "id": "R005",
+    "patient_id": "P002",
+    "type": "CBCT",
+    "date": "2026-07-12",
+    "clinician": "Dr. Lila Fernandes",
+    "findings": [
+      {
+        "description": "Adequate bone height at the lower right first molar implant site",
+        "site": "lower right first molar",
+        "fdi_tooth": "46",
+        "universal_tooth": "30"
+      }
+    ],
+    "impression": "CBCT measurements support implant planning at site 46.",
+    "recommendations": ["Prosthodontic planning. This study is not a surgical guide."]
+  },
+  {
+    "id": "R006",
+    "patient_id": "P003",
+    "type": "OPG",
+    "date": "2025-12-01",
+    "clinician": "Dr. Sameer Qureshi",
+    "findings": [
+      {
+        "description": "Generalized moderate periodontal bone loss",
+        "site": "generalized alveolus",
+        "fdi_tooth": null,
+        "universal_tooth": null
+      },
+      {
+        "description": "Missing lower left first molar",
+        "site": "lower left first molar",
+        "fdi_tooth": "36",
+        "universal_tooth": "19"
+      }
+    ],
+    "impression": "Established periodontal bone loss. Tooth 36 is missing.",
+    "recommendations": ["Periodontal maintenance."]
+  },
+  {
+    "id": "R007",
+    "patient_id": "P003",
+    "type": "OPG",
+    "date": "2026-08-19",
+    "clinician": "Dr. Sameer Qureshi",
+    "findings": [
+      {
+        "description": "Lower right third molar is horizontally impacted",
+        "site": "lower right third molar",
+        "fdi_tooth": "48",
+        "universal_tooth": "32"
+      },
+      {
+        "description": "Mild bone loss around the lower incisors",
+        "site": "lower incisors",
+        "fdi_tooth": null,
+        "universal_tooth": null
+      }
+    ],
+    "impression": "Horizontal impaction of the mandibular right third molar. Mild mandibular anterior bone loss.",
+    "recommendations": [
+      "Surgical opinion for tooth 48.",
+      "Oral hygiene review."
+    ]
+  },
+  {
+    "id": "R008",
+    "patient_id": "P003",
+    "type": "Bitewing",
+    "date": "2026-08-19",
+    "clinician": "Dr. Sameer Qureshi",
+    "findings": [
+      {
+        "description": "Interproximal calculus on the upper right premolars",
+        "site": "upper right premolars",
+        "fdi_tooth": null,
+        "universal_tooth": null
+      }
+    ],
+    "impression": "Calculus deposits. No new radiolucent lesion is described on these bitewings.",
+    "recommendations": ["Hygiene visit."]
+  },
+  {
+    "id": "R009",
+    "patient_id": "P004",
+    "type": "CBCT",
+    "date": "2026-05-02",
+    "clinician": "Dr. Neha Kapoor",
+    "findings": [
+      {
+        "description": "Mesioangular impaction of the lower left third molar close to the inferior alveolar canal",
+        "site": "lower left third molar",
+        "fdi_tooth": "38",
+        "universal_tooth": "17"
+      }
+    ],
+    "impression": "Mesioangular impaction of tooth 38 with canal proximity.",
+    "recommendations": ["Discuss nerve risk before any extraction of tooth 38."]
+  },
+  {
+    "id": "R010",
+    "patient_id": "P004",
+    "type": "IOPA",
+    "date": "2026-05-02",
+    "clinician": "Dr. Arjun Mehta",
+    "findings": [
+      {
+        "description": "Root canal filling in the lower right first molar appears dense",
+        "site": "lower right first molar",
+        "fdi_tooth": "46",
+        "universal_tooth": "30"
+      }
+    ],
+    "impression": "Completed root filling on tooth 46 with no periapical widening described.",
+    "recommendations": ["Clinical review of symptoms on tooth 46."]
+  },
+  {
+    "id": "R011",
+    "patient_id": "P004",
+    "type": "Bitewing",
+    "date": "2026-01-15",
+    "clinician": "Dr. Lila Fernandes",
+    "findings": [
+      {
+        "description": "Possible early enamel radiolucency on the upper right second premolar",
+        "site": "upper right second premolar",
+        "fdi_tooth": "15",
+        "universal_tooth": "4"
+      }
+    ],
+    "impression": "Possible enamel lesion on tooth 15. Clinical correlation is required.",
+    "recommendations": ["Monitor tooth 15."]
+  },
+  {
+    "id": "R012",
+    "patient_id": "P005",
+    "type": "OPG",
+    "date": "2026-03-03",
+    "clinician": "Dr. Sameer Qureshi",
+    "findings": [
+      {
+        "description": "Impacted upper left third molar",
+        "site": "upper left third molar",
+        "fdi_tooth": "28",
+        "universal_tooth": "16"
+      },
+      {
+        "description": "A small supernumerary tooth in the upper anterior maxilla",
+        "site": "upper anterior maxilla",
+        "fdi_tooth": null,
+        "universal_tooth": null
+      }
+    ],
+    "impression": "Impaction of tooth 28 and an unerupted supernumerary tooth.",
+    "recommendations": ["Orthodontic opinion for the supernumerary tooth."]
+  },
+  {
+    "id": "R013",
+    "patient_id": "P005",
+    "type": "CBCT",
+    "date": "2026-03-20",
+    "clinician": "Dr. Lila Fernandes",
+    "findings": [
+      {
+        "description": "The supernumerary tooth lies palatal to the upper central incisors and does not contact the nasal floor",
+        "site": "upper central incisors",
+        "fdi_tooth": null,
+        "universal_tooth": null
+      }
+    ],
+    "impression": "Palatal supernumerary tooth. The nasal floor is intact.",
+    "recommendations": ["Surgical planning if removal is indicated."]
+  },
+  {
+    "id": "R014",
+    "patient_id": "P005",
+    "type": "IOPA",
+    "date": "2026-02-11",
+    "clinician": "Dr. Arjun Mehta",
+    "findings": [
+      {
+        "description": "Horizontal crown fracture of the upper right central incisor confined to enamel and dentine",
+        "site": "upper right central incisor",
+        "fdi_tooth": "11",
+        "universal_tooth": "8"
+      }
+    ],
+    "impression": "Uncomplicated crown fracture of tooth 11. The pulp is not described as exposed.",
+    "recommendations": ["Restorative repair of tooth 11."]
+  },
+  {
+    "id": "R015",
+    "patient_id": "P006",
+    "type": "IOPA",
+    "date": "2026-06-18",
+    "clinician": "Dr. Neha Kapoor",
+    "findings": [
+      {
+        "description": "Periapical radiolucency at the upper left central incisor",
+        "site": "upper left central incisor",
+        "fdi_tooth": "21",
+        "universal_tooth": "9"
+      }
+    ],
+    "impression": "Periapical radiolucency on tooth 21.",
+    "recommendations": ["Pulp testing of tooth 21."]
+  },
+  {
+    "id": "R016",
+    "patient_id": "P006",
+    "type": "Bitewing",
+    "date": "2026-06-18",
+    "clinician": "Dr. Neha Kapoor",
+    "findings": [
+      {
+        "description": "Distal restoration on the upper left first premolar with intact margins",
+        "site": "upper left first premolar",
+        "fdi_tooth": "24",
+        "universal_tooth": "12"
+      }
+    ],
+    "impression": "Intact restoration on tooth 24.",
+    "recommendations": ["Routine recall."]
+  },
+  {
+    "id": "R017",
+    "patient_id": "P006",
+    "type": "CBCT",
+    "date": "2026-09-01",
+    "clinician": "Dr. Arjun Mehta",
+    "findings": [
+      {
+        "description": "Lower right third molar is erupted and not impacted",
+        "site": "lower right third molar",
+        "fdi_tooth": "48",
+        "universal_tooth": "32"
+      },
+      {
+        "description": "The inferior alveolar canal is separate from the roots of tooth 48",
+        "site": "lower right third molar",
+        "fdi_tooth": "48",
+        "universal_tooth": "32"
+      }
+    ],
+    "impression": "Tooth 48 is erupted. No impaction is identified on this CBCT.",
+    "recommendations": ["No surgical workup for impaction of tooth 48."]
+  }
+]

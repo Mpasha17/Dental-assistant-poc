@@ -1,0 +1,23 @@
+[
+  {"id": "S001", "scan_type": "OPG", "date": "2026-10-15", "time": "09:00", "part_of_day": "morning", "booked": false, "patient_id": null},
+  {"id": "S002", "scan_type": "OPG", "date": "2026-10-15", "time": "09:30", "part_of_day": "morning", "booked": true, "patient_id": "P004"},
+  {"id": "S003", "scan_type": "OPG", "date": "2026-10-15", "time": "14:00", "part_of_day": "afternoon", "booked": false, "patient_id": null},
+  {"id": "S004", "scan_type": "CBCT", "date": "2026-10-15", "time": "10:00", "part_of_day": "morning", "booked": false, "patient_id": null},
+  {"id": "S005", "scan_type": "IOPA", "date": "2026-10-15", "time": "11:15", "part_of_day": "morning", "booked": false, "patient_id": null},
+  {"id": "S006", "scan_type": "OPG", "date": "2026-10-16", "time": "09:15", "part_of_day": "morning", "booked": false, "patient_id": null},
+  {"id": "S007", "scan_type": "CBCT", "date": "2026-10-16", "time": "15:00", "part_of_day": "afternoon", "booked": true, "patient_id": "P005"},
+  {"id": "S008", "scan_type": "IOPA", "date": "2026-10-16", "time": "17:30", "part_of_day": "evening", "booked": false, "patient_id": null},
+  {"id": "S009", "scan_type": "OPG", "date": "2026-10-17", "time": "11:00", "part_of_day": "morning", "booked": false, "patient_id": null},
+  {"id": "S010", "scan_type": "CBCT", "date": "2026-10-17", "time": "09:45", "part_of_day": "morning", "booked": false, "patient_id": null},
+  {"id": "S011", "scan_type": "IOPA", "date": "2026-10-17", "time": "14:30", "part_of_day": "afternoon", "booked": false, "patient_id": null},
+  {"id": "S012", "scan_type": "OPG", "date": "2026-10-18", "time": "14:30", "part_of_day": "afternoon", "booked": false, "patient_id": null},
+  {"id": "S013", "scan_type": "IOPA", "date": "2026-10-18", "time": "10:00", "part_of_day": "morning", "booked": true, "patient_id": "P001"},
+  {"id": "S014", "scan_type": "CBCT", "date": "2026-10-18", "time": "16:00", "part_of_day": "afternoon", "booked": false, "patient_id": null},
+  {"id": "S015", "scan_type": "OPG", "date": "2026-10-19", "time": "08:45", "part_of_day": "morning", "booked": false, "patient_id": null},
+  {"id": "S016", "scan_type": "CBCT", "date": "2026-10-19", "time": "13:00", "part_of_day": "afternoon", "booked": false, "patient_id": null},
+  {"id": "S017", "scan_type": "IOPA", "date": "2026-10-19", "time": "18:00", "part_of_day": "evening", "booked": false, "patient_id": null},
+  {"id": "S018", "scan_type": "OPG", "date": "2026-10-20", "time": "09:00", "part_of_day": "morning", "booked": true, "patient_id": "P002"},
+  {"id": "S019", "scan_type": "CBCT", "date": "2026-10-20", "time": "11:30", "part_of_day": "morning", "booked": false, "patient_id": null},
+  {"id": "S020", "scan_type": "IOPA", "date": "2026-10-21", "time": "15:00", "part_of_day": "afternoon", "booked": false, "patient_id": null},
+  {"id": "S021", "scan_type": "OPG", "date": "2026-10-21", "time": "10:15", "part_of_day": "morning", "booked": false, "patient_id": null}
+]

@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Viscan</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect fill='%231f6f6a' width='32' height='32' rx='4'/%3E%3Cpath d='M8 20c2-6 4-10 8-10s6 4 8 10' fill='none' stroke='%23f4efe4' stroke-width='2'/%3E%3C/svg%3E" />
+  <style>
+    :root {
+      --ink: #1c2422;
+      --muted: #5d6a66;
+      --paper: #f3efe6;
+      --card: #fffdf8;
+      --line: #e3d9c8;
+      --spruce: #1f6f6a;
+      --spruce-dark: #154e4b;
+      --coral: #c2452d;
+      --amber: #8a5a12;
+      --shadow: 0 18px 40px rgba(48, 38, 22, 0.08);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(31, 111, 106, 0.08), transparent 32%),
+        linear-gradient(180deg, #f7f3ea 0%, var(--paper) 40%, #efe7da 100%);
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      align-items: end;
+      padding: 28px 32px 12px;
+    }
+    .brand { display: flex; gap: 14px; align-items: center; }
+    .mark {
+      width: 42px; height: 42px; border-radius: 8px;
+      background: var(--spruce); color: #f4efe4;
+      display: grid; place-items: center; font-weight: 700; letter-spacing: 0.08em;
+    }
+    h1 { font-family: Palatino, "Iowan Old Style", Georgia, serif; font-size: 32px; margin: 0; font-weight: 600; }
+    .sub { margin: 4px 0 0; color: var(--muted); }
+    .controls { display: flex; gap: 12px; align-items: end; }
+    label { display: grid; gap: 4px; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+    select, input, textarea, button { font: inherit; }
+    select, input, textarea {
+      background: var(--card); color: var(--ink); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px;
+    }
+    main { display: grid; grid-template-columns: 1fr; gap: 16px; padding: 8px 32px 32px; }
+    .tabs { display: flex; gap: 8px; }
+    .tabs button, .send, .ghost, .mic {
+      border: 0; border-radius: 999px; padding: 10px 16px; cursor: pointer;
+    }
+    .tabs button { background: transparent; color: var(--muted); }
+    .tabs button.active { background: var(--ink); color: white; }
+    .panel { display: none; background: var(--card); border: 1px solid var(--line); border-radius: 18px; box-shadow: var(--shadow); min-height: 68vh; }
+    .panel.active { display: flex; flex-direction: column; }
+    #log { flex: 1; overflow: auto; padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+    .bubble { max-width: 760px; padding: 14px 16px; border-radius: 16px; white-space: pre-wrap; }
+    .bubble.user { align-self: end; background: var(--spruce); color: white; }
+    .bubble.bot { align-self: start; background: #f6f1e7; border: 1px solid var(--line); }
+    .meta { margin-top: 8px; color: var(--muted); font-size: 12px; }
+    .sources, .options { margin-top: 10px; display: grid; gap: 6px; }
+    .sources article, .options button {
+      background: white; border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; text-align: left;
+    }
+    .options button { cursor: pointer; }
+    .composer { display: flex; gap: 8px; padding: 14px; border-top: 1px solid var(--line); }
+    .composer input { flex: 1; }
+    .send { background: var(--spruce); color: white; }
+    .mic { background: white; color: var(--coral); border: 1px solid var(--coral) !important; }
+    .mic.recording { background: var(--coral); color: white; }
+    .dictation { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 16px; }
+    textarea { min-height: 180px; width: 100%; resize: vertical; }
+    pre { margin: 0; white-space: pre-wrap; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; }
+    .warn { color: var(--amber); }
+    @media (max-width: 800px) {
+      header, main { padding-left: 16px; padding-right: 16px; }
+      header, .dictation, .composer { display: grid; grid-template-columns: 1fr; }
+      .bubble { max-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="mark">V</div>
+      <div>
+        <h1>Viscan</h1>
+        <p class="sub">Voice-first chart assistant. Drafts stay drafts until a clinician approves them.</p>
+      </div>
+    </div>
+    <div class="controls">
+      <label>Role
+        <select id="role">
+          <option value="dentist">Dentist</option>
+          <option value="radiologist">Radiologist</option>
+          <option value="assistant">Assistant</option>
+        </select>
+      </label>
+      <label>Session
+        <input id="session" value="" placeholder="auto" />
+      </label>
+    </div>
+  </header>
+  <main>
+    <div class="tabs">
+      <button type="button" class="active" data-tab="chat">Chat</button>
+      <button type="button" data-tab="dictation">Dictation</button>
+    </div>
+    <section id="chat" class="panel active">
+      <div id="log"></div>
+      <form class="composer" id="chat-form">
+        <input id="text" autocomplete="off" placeholder="Open Rahul's latest OPG report" />
+        <button class="mic" id="mic" type="button">Hold to talk</button>
+        <button class="send" type="submit">Send</button>
+      </form>
+    </section>
+    <section id="dictation" class="panel">
+      <div class="dictation">
+        <div>
+          <label>Transcript
+            <textarea id="dictation-text">Lower right third molar is horizontally impacted</textarea>
+          </label>
+          <div class="composer" style="border: 0; padding: 12px 0 0;">
+            <input id="dictation-patient" placeholder="Patient id, optional (P003)" />
+            <button class="send" id="draft-btn" type="button">Draft</button>
+            <button class="ghost" id="approve-btn" type="button">Approve</button>
+          </div>
+          <p id="dictation-status" class="meta"></p>
+        </div>
+        <div>
+          <label>Findings JSON
+            <textarea id="findings-json" spellcheck="false"></textarea>
+          </label>
+          <div class="composer" style="border: 0; padding: 12px 0;">
+            <button class="ghost" id="save-findings" type="button">Save edits</button>
+          </div>
+          <label>Draft text
+            <pre id="draft-text"></pre>
+          </label>
+        </div>
+      </div>
+    </section>
+  </main>
+  <script>
+    const roleEl = document.querySelector("#role");
+    const sessionEl = document.querySelector("#session");
+    const logEl = document.querySelector("#log");
+    let draftId = null;
+
+    document.querySelectorAll(".tabs button").forEach((button) => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll(".tabs button").forEach((item) => item.classList.remove("active"));
+        document.querySelectorAll(".panel").forEach((item) => item.classList.remove("active"));
+        button.classList.add("active");
+        document.querySelector("#" + button.dataset.tab).classList.add("active");
+      });
+    });
+
+    function headers() {
+      return { "Content-Type": "application/json", "X-User-Role": roleEl.value };
+    }
+
+    function remember(payload) {
+      if (payload.session_id) sessionEl.value = payload.session_id;
+    }
+
+    function renderSources(sources) {
+      if (!sources || !sources.length) return "";
+      const items = sources.map((source) => {
+        const quotes = (source.quotes || []).map((quote) => `<div>“${quote}”</div>`).join("");
+        return `<article><strong>${source.report_id || "source"}</strong> · ${source.patient_id || "no patient"}<br>${(source.fields || []).join(", ")}${quotes}</article>`;
+      }).join("");
+      return `<div class="sources"><strong>Sources</strong>${items}</div>`;
+    }
+
+    function addBubble(kind, title, payload) {
+      const node = document.createElement("div");
+      node.className = "bubble " + kind;
+      const warnings = (payload && payload.warnings || []).map((item) => `<div class="warn">${item}</div>`).join("");
+      const options = (payload && payload.clarification_options || []).map((option) =>
+        `<button type="button" data-name="${option.full_name}">${option.full_name} · born ${option.dob_year} · visit ${option.last_visit}</button>`
+      ).join("");
+      node.innerHTML = `${title}${warnings}${options ? `<div class="options">${options}</div>` : ""}${payload ? renderSources(payload.sources) : ""}`;
+      if (payload) {
+        const meta = document.createElement("div");
+        meta.className = "meta";
+        meta.textContent = `${payload.intent || ""} · ${payload.provider_used || ""}${payload.stt_provider ? " · stt " + payload.stt_provider : ""} · ${payload.latency_ms || 0} ms`;
+        node.appendChild(meta);
+      }
+      node.querySelectorAll("[data-name]").forEach((button) => {
+        button.addEventListener("click", () => sendText(button.dataset.name));
+      });
+      logEl.appendChild(node);
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    async function sendText(text) {
+      addBubble("user", text);
+      const response = await fetch("/chat", {
+        method: "POST",
+        headers: headers(),
+        body: JSON.stringify({ session_id: sessionEl.value || null, text })
+      });
+      const payload = await response.json();
+      if (!response.ok) {
+        addBubble("bot", payload.error || "Request failed");
+        return;
+      }
+      remember(payload);
+      addBubble("bot", payload.answer, payload);
+    }
+
+    document.querySelector("#chat-form").addEventListener("submit", (event) => {
+      event.preventDefault();
+      const input = document.querySelector("#text");
+      const text = input.value.trim();
+      if (!text) return;
+      input.value = "";
+      sendText(text);
+    });
+
+    const mic = document.querySelector("#mic");
+    let stream = null;
+    let audioContext = null;
+    let processor = null;
+    let recording = false;
+    let released = false;
+    let samples = [];
+    let startedAt = 0;
+
+    function mergeSamples(buffers) {
+      const length = buffers.reduce((sum, buffer) => sum + buffer.length, 0);
+      const merged = new Float32Array(length);
+      let offset = 0;
+      buffers.forEach((buffer) => {
+        merged.set(buffer, offset);
+        offset += buffer.length;
+      });
+      return merged;
+    }
+
+    function encodeWav(input, sampleRate) {
+      const targetRate = 16000;
+      const ratio = sampleRate / targetRate;
+      const length = Math.max(1, Math.floor(input.length / ratio));
+      const buffer = new ArrayBuffer(44 + length * 2);
+      const view = new DataView(buffer);
+      const write = (offset, text) => {
+        for (let index = 0; index < text.length; index += 1) {
+          view.setUint8(offset + index, text.charCodeAt(index));
+        }
+      };
+      write(0, "RIFF");
+      view.setUint32(4, 36 + length * 2, true);
+      write(8, "WAVE");
+      write(12, "fmt ");
+      view.setUint32(16, 16, true);
+      view.setUint16(20, 1, true);
+      view.setUint16(22, 1, true);
+      view.setUint32(24, targetRate, true);
+      view.setUint32(28, targetRate * 2, true);
+      view.setUint16(32, 2, true);
+      view.setUint16(34, 16, true);
+      write(36, "data");
+      view.setUint32(40, length * 2, true);
+      let cursor = 44;
+      for (let index = 0; index < length; index += 1) {
+        const sample = input[Math.min(input.length - 1, Math.floor(index * ratio))] || 0;
+        const clamped = Math.max(-1, Math.min(1, sample));
+        view.setInt16(cursor, clamped < 0 ? clamped * 0x8000 : clamped * 0x7fff, true);
+        cursor += 2;
+      }
+      return new Blob([buffer], { type: "audio/wav" });
+    }
+
+    function releaseAudio() {
+      if (processor) {
+        processor.onaudioprocess = null;
+        processor.disconnect();
+        processor = null;
+      }
+      if (stream) {
+        stream.getTracks().forEach((track) => track.stop());
+        stream = null;
+      }
+      if (audioContext) {
+        audioContext.close();
+        audioContext = null;
+      }
+    }
+
+    async function sendAudio(blob) {
+      const body = new FormData();
+      body.append("audio", blob, "speech.wav");
+      if (sessionEl.value) body.append("session_id", sessionEl.value);
+      const response = await fetch("/voice", {
+        method: "POST",
+        headers: { "X-User-Role": roleEl.value },
+        body
+      });
+      const payload = await response.json();
+      if (!response.ok) {
+        addBubble("bot", payload.error || "Voice request failed");
+        return;
+      }
+      remember(payload);
+      addBubble("user", payload.transcript || "(audio)");
+      addBubble("bot", payload.answer, payload);
+    }
+
+    async function startMic() {
+      if (recording || audioContext) return;
+      released = false;
+      samples = [];
+      const context = new AudioContext();
+      audioContext = context;
+      const live = await navigator.mediaDevices.getUserMedia({
+        audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true }
+      });
+      if (released) {
+        live.getTracks().forEach((track) => track.stop());
+        context.close();
+        if (audioContext === context) audioContext = null;
+        return;
+      }
+      stream = live;
+      await context.resume();
+      const source = context.createMediaStreamSource(live);
+      processor = context.createScriptProcessor(4096, 1, 1);
+      const mute = context.createGain();
+      mute.gain.value = 0;
+      processor.onaudioprocess = (event) => {
+        if (!recording) return;
+        samples.push(new Float32Array(event.inputBuffer.getChannelData(0)));
+      };
+      source.connect(processor);
+      processor.connect(mute);
+      mute.connect(context.destination);
+      recording = true;
+      startedAt = performance.now();
+      mic.classList.add("recording");
+      mic.textContent = "Listening…";
+    }
+
+    function stopMic() {
+      released = true;
+      if (!recording) return;
+      recording = false;
+      mic.classList.remove("recording");
+      mic.textContent = "Hold to talk";
+      const elapsed = performance.now() - startedAt;
+      const rate = audioContext ? audioContext.sampleRate : 48000;
+      const merged = mergeSamples(samples);
+      samples = [];
+      releaseAudio();
+      if (elapsed < 450 || merged.length < rate * 0.35) {
+        addBubble("bot", "Hold the button while you speak, then release.");
+        return;
+      }
+      sendAudio(encodeWav(merged, rate)).catch((error) => {
+        addBubble("bot", "Voice request failed: " + error.message);
+      });
+    }
+
+    mic.addEventListener("pointerdown", (event) => {
+      event.preventDefault();
+      if (mic.setPointerCapture) mic.setPointerCapture(event.pointerId);
+      startMic().catch((error) => {
+        released = true;
+        recording = false;
+        releaseAudio();
+        mic.classList.remove("recording");
+        mic.textContent = "Hold to talk";
+        addBubble("bot", "Microphone unavailable: " + error.message);
+      });
+    });
+    mic.addEventListener("pointerup", stopMic);
+    mic.addEventListener("pointercancel", stopMic);
+
+    function showDraft(payload) {
+      const draft = payload.data || payload;
+      draftId = draft.report_id;
+      document.querySelector("#findings-json").value = JSON.stringify(draft.findings || [], null, 2);
+      document.querySelector("#draft-text").textContent = draft.draft_text || "";
+      const removed = (draft.unsupported_claims_removed || []).join("; ");
+      document.querySelector("#dictation-status").textContent =
+        `${draft.status} · review ${draft.requires_clinician_review} · ${payload.provider_used || ""}` +
+        (removed ? ` · removed: ${removed}` : "");
+    }
+
+    document.querySelector("#draft-btn").addEventListener("click", async () => {
+      const response = await fetch("/dictation", {
+        method: "POST",
+        headers: headers(),
+        body: JSON.stringify({
+          session_id: sessionEl.value || null,
+          patient_id: document.querySelector("#dictation-patient").value || null,
+          transcript: document.querySelector("#dictation-text").value
+        })
+      });
+      const payload = await response.json();
+      if (!response.ok) {
+        document.querySelector("#dictation-status").textContent = payload.error || "Draft failed";
+        return;
+      }
+      remember(payload);
+      showDraft(payload);
+    });
+
+    document.querySelector("#save-findings").addEventListener("click", async () => {
+      if (!draftId) return;
+      const response = await fetch("/draft/" + draftId, {
+        method: "PUT",
+        headers: headers(),
+        body: JSON.stringify({ findings: JSON.parse(document.querySelector("#findings-json").value || "[]") })
+      });
+      const payload = await response.json();
+      if (!response.ok) {
+        document.querySelector("#dictation-status").textContent = payload.error || "Save failed";
+        return;
+      }
+      showDraft(payload);
+    });
+
+    document.querySelector("#approve-btn").addEventListener("click", async () => {
+      if (!draftId) return;
+      const response = await fetch("/draft/" + draftId + "/approve", { method: "POST", headers: headers() });
+      const payload = await response.json();
+      if (!response.ok) {
+        document.querySelector("#dictation-status").textContent = payload.error || "Approve failed";
+        return;
+      }
+      showDraft(payload);
+    });
+  </script>
+</body>
+</html>
