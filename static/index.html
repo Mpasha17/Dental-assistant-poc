@@ -49,18 +49,18 @@
     select, input, textarea {
       background: var(--card); color: var(--ink); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px;
     }
-    main { display: grid; grid-template-columns: 1fr; gap: 16px; padding: 8px 32px 32px; }
+    main { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; padding: 8px 32px 32px; }
     .tabs { display: flex; gap: 8px; }
     .tabs button, .send, .ghost, .mic {
       border: 0; border-radius: 999px; padding: 10px 16px; cursor: pointer;
     }
     .tabs button { background: transparent; color: var(--muted); }
     .tabs button.active { background: var(--ink); color: white; }
-    .panel { display: none; background: var(--card); border: 1px solid var(--line); border-radius: 18px; box-shadow: var(--shadow); min-height: 68vh; }
+    .panel { min-width: 0; display: none; background: var(--card); border: 1px solid var(--line); border-radius: 18px; box-shadow: var(--shadow); min-height: 68vh; }
     .panel.active { display: flex; flex-direction: column; }
-    #log { flex: 1; overflow: auto; padding: 20px; display: flex; flex-direction: column; gap: 14px; }
-    .bubble { max-width: 760px; padding: 14px 16px; border-radius: 16px; white-space: pre-wrap; }
-    .bubble.user { align-self: end; background: var(--spruce); color: white; }
+    #log { flex: 1; min-width: 0; overflow-y: auto; overflow-x: hidden; padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+    .bubble { max-width: min(760px, 85%); overflow-wrap: anywhere; box-sizing: border-box; padding: 14px 16px; border-radius: 16px; white-space: pre-wrap; }
+    .bubble.user { align-self: flex-end; margin-right: 4px; background: var(--spruce); color: white; }
     .bubble.bot { align-self: start; background: #f6f1e7; border: 1px solid var(--line); }
     .meta { margin-top: 8px; color: var(--muted); font-size: 12px; }
     .sources, .options { margin-top: 10px; display: grid; gap: 6px; }
