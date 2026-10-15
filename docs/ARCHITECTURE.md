@@ -9,8 +9,8 @@ flowchart TD
   audio -->|no| text[Transcript]
   stt --> text
   text --> llm[LLM interpreter: Gemini, Mistral, Groq, or rules]
-  llm --> call[Proposed tool call]
-  call --> rules[Validator: allow-list, schema, role, confirmation]
+  llm --> proposed[Proposed tool call]
+  proposed --> rules[Validator: allow-list, schema, role, confirmation]
   rules --> resolve[Patient resolution in Python]
   resolve -->|two close matches| ask[Clarification with candidates]
   resolve -->|one patient| tools[Deterministic tools over JSON]
